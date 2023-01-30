@@ -1,0 +1,7 @@
+command used to compile c file
+
+gcc exec.c -o exec
+
+command used to run the file
+
+./exec ls -l /usr
