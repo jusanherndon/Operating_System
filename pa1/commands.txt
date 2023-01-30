@@ -1,7 +1,7 @@
 command used to compile c file
 
-gcc exec.c -o exec
-gcc fork.c -o fork
+gcc jh4411_exec.c -o exec
+gcc jh4411_fork.c -o fork
 
 command used to run the file
 
