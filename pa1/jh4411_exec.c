@@ -7,10 +7,6 @@ if(argc < 4){
 printf("Not enough arguemnts were entered into the command line. Please enter the correct amount\n");
 return 1;
 }
-if(argv[1]== NULL){
-printf("A command was not entered in as an arguement. Rerun the program.\n");
-return 1;
-}
 
 char* command = argv[1];
 char* arguements[50] = {};
@@ -24,7 +20,7 @@ counter++;
 int status_code = execvp(command,arguements);
 
 if(status_code == -1){
-printf("Process did not terminate corectly\n");
+printf("The command and/or arguements that were inputted are not valid\n");
 return 1;
 }
 
