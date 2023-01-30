@@ -3,6 +3,10 @@
 
 int main(int argc, char *argv[]){
 
+if(argc < 4){
+printf("Not enough arguemnts were entered into the command line. Please enter the correct amount\n");
+return 1;
+}
 if(argv[1]== NULL){
 printf("A command was not entered in as an arguement. Rerun the program.\n");
 return 1;
@@ -12,11 +16,7 @@ char* command = argv[1];
 char* arguements[50] = {};
 int counter = 0;
 
-for(int i=2;i<4;i++){
-if(argv[i]== NULL){
-printf("An arguement was left out. Please rerun the program again with all of its arguements\n");
-return 1;
-}
+for(int i=2;i<argc;i++){
 arguements[counter] = argv[i];
 counter++;
 }
