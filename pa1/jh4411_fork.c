@@ -2,11 +2,16 @@
 #include <unistd.h>
 
 int main(){
-//Not much to explain here. This is a for loop that forks on every instance until completion and
-//prints out its current counter value
+// I am using an if conditional to check if the process running is ths child or the parent
+
 for(int i=0; i<20;i++){
-fork();
-printf("%d",i);
+printf("parent:%d\n",i);
+}
+
+if(fork()== 0){
+for(int i=0; i<20;i++){
+printf("child:%d\n",i);
+}
 }
 return 0;
 }
