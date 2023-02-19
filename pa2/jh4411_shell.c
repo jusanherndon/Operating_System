@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -8,6 +9,7 @@ int main(){
 
 
 char input[10];
+char* command = malloc(sizeof(input));
 char* split_input;
 char* args;
 
@@ -16,28 +18,34 @@ while(1){
 printf("Please enter a string into the terminal:");
 scanf("%s",input);
 
-strtok_r(input, "", &split_input);
+//strtok_r(input, "", &split_input);
 
 // The first line in the string inputed should be the command
 //if(split_input[0] != NULL){
 
-char* command;
+printf("%s\n",input);
+//printf("%s", split_input);
+
+
 strcpy(command, input);
 
-strtok_r(split_input, "", &args);
+//strtok_r(split_input, "", &args);
 
 char* arguements[50] = {}; 
 
-arguements[0] = split_input;
-arguements[1] = args;
+//arguements[0] = split_input;
+arguements[0] = NULL;
+//arguements[1] = args;
 
 //fork();
 int status_code = execvp(command,arguements);
+
 
 if(status_code == -1){
 printf("The command and/or arguements that were inputted are not valid\n");
 return 1;
 }
+
 //}
 
 }
