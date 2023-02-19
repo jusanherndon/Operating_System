@@ -8,25 +8,28 @@ int main(){
 // in command arguements and run it as a seperate process this time
 
 
-char input[10];
+char input[20];
 char* command = malloc(sizeof(input));
 
-//char* split_input;
-char* args;
+char* search= " ";
+char* args[20] = {};
 
 while(1){
 
 printf("Please enter a string into the terminal:");
-scanf("%s",input);
+fgets(input,sizeof(input),stdin);
 
-strcpy(command, input);
+puts(input);
 
-char* arguements[50] = {}; 
 
-arguements[0] = NULL;
+command = strtok(input,search);
+args[0] = strtok(NULL,search);
+
+printf(args[0]);
+
 
 //fork();
-int status_code = execvp(command,arguements);
+int status_code = execvp(command,args);
 
 
 if(status_code == -1){
