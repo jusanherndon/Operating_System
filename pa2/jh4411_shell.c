@@ -9,10 +9,15 @@ int main(){
 
 
 char input[20];
+char* buffer;
+char* token;
 char* command = malloc(sizeof(input));
 
 char* search= " ";
 char* args[20] = {};
+char* arguements[20] = {};
+int counter = 0;
+int count = 0;
 
 while(1){
 
@@ -22,14 +27,32 @@ fgets(input,sizeof(input),stdin);
 puts(input);
 
 
-command = strtok(input,search);
-args[0] = strtok(NULL,search);
+if (input != NULL) {
 
-printf(args[0]);
+  buffer = input;
+
+  while ((token = strsep(&buffer, " ")) != NULL)
+  {
+    args[counter] = token; 
+    counter++;
+  }
+
+  free(buffer);
+}
+
+for(int i=1; 1<counter; i++){
+arguements[count]= args[i];
+count++;
+}
 
 
+command = args[0];
+
+printf(command);
+printf(arguements[0]);
+printf(arguements[1]);
 //fork();
-int status_code = execvp(command,args);
+int status_code = execvp(command,arguements);
 
 
 if(status_code == -1){
