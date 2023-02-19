@@ -4,13 +4,10 @@
 #include <string.h>
 
 int main(){
-// logic used in my last programming assignment in order to take 
-// in command arguements and run it as a seperate process this time
-
 
 char input[20];
-char* buffer;
-char* token;
+char* buffer = malloc(sizeof(input));
+char* token = malloc(sizeof(input));
 char* command = malloc(sizeof(input));
 
 char* search= " ";
@@ -24,16 +21,18 @@ while(1){
 printf("Please enter a string into the terminal:");
 fgets(input,sizeof(input),stdin);
 
-puts(input);
+printf(input);
 
 
+printf("first strcpy");
 if (input != NULL) {
-
-  buffer = input;
+  strcpy(buffer,input);
+  //buffer = input;
 
   while ((token = strsep(&buffer, " ")) != NULL)
   {
-    args[counter] = token; 
+    strcpy(args[counter],token);
+    //args[counter] = token; 
     counter++;
   }
 
@@ -45,8 +44,10 @@ arguements[count]= args[i];
 count++;
 }
 
+puts(input);
 
-command = args[0];
+strcpy(command,args[0]);
+//command = args[0];
 
 printf(command);
 printf(arguements[0]);
