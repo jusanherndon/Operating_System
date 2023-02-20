@@ -3,63 +3,51 @@
 #include <unistd.h>
 #include <string.h>
 
+//I used babyshell and simple-strtok as examples
+
 int main(){
 
-char command[10];
-char arg1[20] = "";
-char arg2[20] = "";
-
-char* search= " ";
-char* arguements[20] = {};
+char input[50];
+char* command;
+char* pch;
+char* args[50] = {};
+char* arguements[50] = {};
 int counter = 0;
 int count = 0;
 
 while(1){
 
 printf("Please enter a string into the terminal:");
-fscanf(stdin,"%s %s %s", command, arg1, arg2);
+while ( fgets(input,256,stdin) != NULL )
+    {
 	
-printf("%s\n", command);
-printf("%s\n", arg1);
-//printf("%s\n", arg2);
+    pch = strtok (input," \t\n");
+    while (pch != NULL)
+    {
+	args[counter] = pch;
+	pch = strtok (NULL, " \t\n");
+	counter++;
+    }  
+    for(int i=1; i<counter; i++)
+    {
+	arguements[count] = args[i];
+	count++;
+    }  
+    command = args[0]; 
+    int status_code = execvp(command,arguements);
 
-printf("continue");
+    if(status_code == -1){
+        printf("The command and/or arguements that were inputted are not valid\n");
+        return 1;
+}
+//execlp(command,command, (char *) NULL);  
+
+}
+
 /*
-printf("first strcpy");
-if (input != NULL) {
-
-  while ((token = strsep(&input, " ")) != NULL)
-  {
-    strcpy(args[counter],token);
-    //args[counter] = token; 
-    counter++;
-  }
-}
-
-for(int i=1; 1<counter; i++){
-arguements[count]= args[i];
-count++;
-}
-
-puts(input);
-
-strcpy(command,args[0]);
-//command = args[0];
-
-printf(command);
-printf(arguements[0]);
-printf(arguements[1]);
-*/
 //fork();
 
-/*
-int status_code = execvp(command,arguements);
 
-
-if(status_code == -1){
-printf("The command and/or arguements that were inputted are not valid\n");
-return 1;
-}
 */
 }
 
