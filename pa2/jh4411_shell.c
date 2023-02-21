@@ -12,16 +12,20 @@ int main(){
 
 char input[257];
 char* args[50] = {};
-char* arguements[50] = {};
 int pid;
 int counter = 0;
 int status_code = 0; 
+
+enum ampersand;
+enum lessthansign;
+enum greatorthansign;
+
 
 while(1){
 
     printf("Please enter a string into the terminal:");
     while ( fgets(input,256,stdin) != NULL ){	
-        char* pch = strtok (input," \t\n");
+        char* pch = strtok (input," \n");
         int ampersant = 0;
         while (pch != NULL){
 	        if(strcmp(pch,"&")== 0){
@@ -34,6 +38,11 @@ while(1){
 		}
             }    
         char* command = args[0]; 
+	
+for(int i =0; i < 5; i++){
+printf(args[i]);
+printf("\n");
+}
 
         switch(pid=fork()){
             
@@ -45,7 +54,6 @@ while(1){
 		    break;
         }
     }
-    printf("Please enter a string into the terminal:");
 }
 
 return 0;
