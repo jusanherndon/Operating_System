@@ -37,7 +37,7 @@ while(1){
 
         switch(pid=fork()){
             
-	    default: if(ampersant){
+	    default: if(!ampersant){
 		     wait(&status_code);
 		     }
 	             break;
