@@ -10,15 +10,24 @@
 #define PATH_MAX          64
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
+//The only reason I made these history
+//variable global is to give the signal 
+//handler access to the shell's history
 char history[10][CMD_LENGTH];
 int history_index = 0;
 
+// This is the signal handler for the USR1
+// signal that writes the history to the
+// audit.log. The two statements are to allow
+// for the history to be printer in this format
+// 0: command
 void signalHandler(int signal){
     
-    FILE* file;
     if(signal == SIGUSR1){
+        FILE* file;
         file = fopen("audit.log","w");
-        for (int i = 0; i < MIN(history_index, 10); i++) {
+        
+	for (int i = 0; i < MIN(history_index, 10); i++) {
             if ((history_index % 10) - 1 - i >= 0) {
                 fprintf(file,"%3d: %s\n", i + 1, history[(history_index % 10) - 1 - i]);
             } 
@@ -27,13 +36,13 @@ void signalHandler(int signal){
                 }
             }
 	}
-
     fclose(file);
     exit(0);
     return;
 }
 
-
+// These are all of the different special characters/functions
+// that are handled within the shell
 typedef enum Tokens {
     Ampersand,
     Less_Than,
@@ -43,6 +52,8 @@ typedef enum Tokens {
     Other
 } Tokens;
 
+// This function is used to relate the special 
+// characters to their associated enum values.
 Tokens identify_token(char* token, int tok_num) {
 
     if(*token == '&'){
@@ -56,6 +67,8 @@ Tokens identify_token(char* token, int tok_num) {
     }
     // I don't know why this is happening but on my
     // local machine these are flipped for some reason
+    // when I run my shell. ie: cd is history and vice
+    // versa
     if(strcmp(token,"history")){
         return Cd;
     }
@@ -67,36 +80,59 @@ Tokens identify_token(char* token, int tok_num) {
     }
 }
 
+// This function reads the input from the stdin character 
+// by character and creates unique tokens for all of the input.
+// It return the number of token within the char* array
 int tokenize_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type) {
     int num_tok = 0;
     char buf[TOKEN_LENGTH] = "";
     int buf_index = 0;
     char* new_tok = NULL;
     char new_char = '\0';
-
+    
+    // This is the main loop where the characters get read
+    // in and tokenized. The loop breaks on the newline 
+    // character.  
     while (1) {
-        new_char = (char)fgetc(stdin);
-        if (new_char == '\n') break;
-
+        
+	new_char = (char)fgetc(stdin);
+        if (new_char == '\n'){
+	    break;
+        }
+	// This conditional is activated on space 
+	// characters and moves the char* array
+	// from the buffer into a char* array
         if (new_char == ' ' && strlen(buf) > 0) {
+
             token_type[num_tok] = identify_token(buf,num_tok);
 
             new_tok = (char*)calloc(strlen(buf) + 1, sizeof(char));
             strcpy(new_tok, buf);
-
+	    // This line is for error checking. It checks
+	    // if their is enough space in the buffer to
+	    // hold both the character and the '\0', since
+	    // without it the buffer would get nonsensicle 
+	    // values.
             if (num_tok == CMD_LENGTH - 1) return -2;
 
             token_arr[num_tok++] = new_tok;
             buf_index = 0;
             buf[buf_index] = '\0';
         } 
+
+	// This conditional puts the character from
+	// the console into a buffer
 	else if (new_char != ' ') {
             if (buf_index == TOKEN_LENGTH - 1) return -1;
             buf[buf_index++] = new_char;
             buf[buf_index] = '\0';
         }
     }
-
+    
+    // This last check is to make sure the buffer 
+    // is empty, sicne the loop above can leave a 
+    // single char* in it, to prevent ending spaces
+    // to be added into the char* []
     if (strlen(buf) > 0) {
         token_type[num_tok] = identify_token(buf,num_tok);
         new_tok = (char*)calloc(strlen(buf) + 1, sizeof(char));
@@ -107,6 +143,7 @@ int tokenize_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type) {
     return num_tok;
 }
 
+//
 void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][CMD_LENGTH], int history_index, int num_tok) {
     char* cmd[CMD_LENGTH];
     int cmd_num = 0;
