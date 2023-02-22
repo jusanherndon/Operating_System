@@ -6,6 +6,7 @@
 
 #define TOKEN_LENGTH  64
 #define CMD_LENGTH    256
+#define PATH_MAX          64
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 typedef enum Tokens {
@@ -28,10 +29,12 @@ Tokens identify_token(char* token, int tok_num) {
     if(*token == '>'){
         return Greater_Than;
     }
-    if(token == "cd"){
+    // I don't know why this is happening but on my
+    // local machine these are flipped for some reason
+    if(strcmp(token,"history")){
         return Cd;
     }
-    if(token == "history"){
+    if(strcmp(token,"cd")){
         return History;
     }
     else{
@@ -83,6 +86,7 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
     char* cmd[CMD_LENGTH];
     int cmd_num = 0;
     int pid;
+    int status_code;
 
     for (int i = 0; i < num_tok; i++) {
         switch (token_type[i]) {
@@ -116,10 +120,10 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
                          printf("%3d: %s\n", i + 1, history[(history_index % 10) - i + 9]);
                      }
                  }
-                break;
+                 break;
             case Cd:
-                //Redirect file
-                break;
+		 status_code = chdir(token_arr[i+1]);
+                 break;
             case Other:
                 cmd[cmd_num++] = token_arr[i];
                 break;
@@ -128,19 +132,21 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
                 break;
         }
     }
-
-    switch (pid = fork()) {
-        case 0:
-            cmd[cmd_num] = NULL;
-            execvp(cmd[0], cmd);
-            exit(1);
-            break;
-        case -1:
-            fprintf(stderr, "ERROR");
-            break;
-        default: 
-            wait(NULL);
-            break;
+    
+    if(token_type[num_tok-1] != Ampersand | token_type[num_tok-1] != Cd | token_type[num_tok-1] != History) {
+        switch (pid = fork()) {
+            case 0:
+                cmd[cmd_num] = NULL;
+                execvp(cmd[0], cmd);
+                exit(1);
+                break;
+            case -1:
+                fprintf(stderr, "ERROR");
+                break;
+            default: 
+                wait(NULL);
+                break;
+        }
     }
     return;
 }
@@ -181,11 +187,11 @@ int main() {
         strcat(history[history_index % 10], tokens[num_tok - 1]);
         history_index++;
 
-        // printf("%d\n", num_tok);
-        // for (int i = 0; i < num_tok; i++) {
-        //     printf("|%s %d|", tokens[i], token_type[i]);
-        // }
-        // printf("END");
+         //printf("%d\n", num_tok);
+         //for (int i = 0; i < num_tok; i++) {
+         //    printf("|%s %d|", tokens[i], token_type[i]);
+         //}
+         //printf("END");
         if (num_tok == -1 || num_tok == -2) {
             puts("PANIC");
             return 1;
