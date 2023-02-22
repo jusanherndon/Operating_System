@@ -64,7 +64,8 @@ int tokenize_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type) {
             token_arr[num_tok++] = new_tok;
             buf_index = 0;
             buf[buf_index] = '\0';
-        } else if (new_char != ' ') {
+        } 
+	else if (new_char != ' ') {
             if (buf_index == TOKEN_LENGTH - 1) return -1;
             buf[buf_index++] = new_char;
             buf[buf_index] = '\0';
@@ -78,7 +79,6 @@ int tokenize_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type) {
         if (num_tok == CMD_LENGTH - 1) return -2;
         token_arr[num_tok++] = new_tok;
     }
-
     return num_tok;
 }
 
@@ -159,20 +159,6 @@ int main() {
     char history[10][CMD_LENGTH];
     int history_index = 0;
     
-    // printf("%d\n", num_tok);
-    // for (int i = 0; i <= num_tok; i++) {
-    //     if (tokens[i] == NULL) {
-    //         puts("I AM NULL");
-    //     } else {
-    //         printf("|%s %d|", tokens[i], *token_type[i]);
-    //     }
-    // }
-
-    // int status_code = parse_tokens(tokens, num_tok);
-    // printf("%d\n", status_code);
-
-    
-
     while (1) {
         printf("[fake@shell]$ ");
 
@@ -187,19 +173,12 @@ int main() {
         strcat(history[history_index % 10], tokens[num_tok - 1]);
         history_index++;
 
-         //printf("%d\n", num_tok);
-         //for (int i = 0; i < num_tok; i++) {
-         //    printf("|%s %d|", tokens[i], token_type[i]);
-         //}
-         //printf("END");
         if (num_tok == -1 || num_tok == -2) {
             puts("PANIC");
             return 1;
         }
-
         run_cmd(tokens, token_type, history, history_index, num_tok);
     }
-
     return 0;
 }
 
