@@ -3,11 +3,35 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 #define TOKEN_LENGTH  64
 #define CMD_LENGTH    256
 #define PATH_MAX          64
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+
+void signalHandler(int signal){
+    
+    FILE* file;
+    if(signal == SIGUSR1){
+        file = fopen("audit.log","w");
+        while(){
+
+            for (int i = 0; i < MIN(history_index, 10); i++) {
+                if ((history_index % 10) - 1 - i >= 0) {
+                    printf("%3d: %s\n", i + 1, history[(history_index % 10) - 1 - i]);
+                } 
+		else {
+                    printf("%3d: %s\n", i + 1, history[(history_index % 10) - i + 9]);
+                }
+            }
+	}
+
+	fclose(file);
+        exit(0);
+    }
+}
+
 
 typedef enum Tokens {
     Ampersand,
@@ -160,6 +184,10 @@ int main() {
     int history_index = 0;
     
     while (1) {
+	
+	signal(SIGUSR1,signalHandler);
+	raise(SIGUSR1);
+
         printf("[fake@shell]$ ");
 
         num_tok = tokenize_cmd(tokens, token_type);
