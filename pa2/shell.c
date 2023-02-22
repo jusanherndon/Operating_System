@@ -10,26 +10,27 @@
 #define PATH_MAX          64
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
+char history[10][CMD_LENGTH];
+int history_index = 0;
+
 void signalHandler(int signal){
     
     FILE* file;
     if(signal == SIGUSR1){
         file = fopen("audit.log","w");
-        while(){
-
-            for (int i = 0; i < MIN(history_index, 10); i++) {
-                if ((history_index % 10) - 1 - i >= 0) {
-                    printf("%3d: %s\n", i + 1, history[(history_index % 10) - 1 - i]);
-                } 
-		else {
-                    printf("%3d: %s\n", i + 1, history[(history_index % 10) - i + 9]);
+        for (int i = 0; i < MIN(history_index, 10); i++) {
+            if ((history_index % 10) - 1 - i >= 0) {
+                fprintf(file,"%3d: %s\n", i + 1, history[(history_index % 10) - 1 - i]);
+            } 
+	    else {
+                fprintf(file,"%3d: %s\n", i + 1, history[(history_index % 10) - i + 9]);
                 }
             }
 	}
 
-	fclose(file);
-        exit(0);
-    }
+    fclose(file);
+    exit(0);
+    return;
 }
 
 
@@ -180,8 +181,6 @@ int main() {
     Tokens token_type[CMD_LENGTH];
     int num_tok = 0;
 
-    char history[10][CMD_LENGTH];
-    int history_index = 0;
     
     while (1) {
 	
