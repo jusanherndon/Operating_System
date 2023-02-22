@@ -10,6 +10,8 @@
 #define PATH_MAX          64
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
+// I used the sample files posted for reference in my code
+
 //The only reason I made these history
 //variable global is to give the signal 
 //handler access to the shell's history
@@ -143,13 +145,18 @@ int tokenize_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type) {
     return num_tok;
 }
 
-//
+// This function is where the commands are actually run using
+// execvp and this function also handles all of the special
+// characters and functions
 void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][CMD_LENGTH], int history_index, int num_tok) {
+    
     char* cmd[CMD_LENGTH];
     int cmd_num = 0;
     int pid;
     int status_code;
-
+    
+    // this loop goes through all of the tokens to check 
+    // for all of the special cases of each character 
     for (int i = 0; i < num_tok; i++) {
         switch (token_type[i]) {
             case Ampersand:
@@ -167,12 +174,16 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
 			 break;
                  }
                  break;
+	    // I ran out of time so here are these characters
+	    // unimplemented
             case Less_Than:
-                //Redirect file
+                //Redirect a file into stdin
                 break;
             case Greater_Than:
-                //Redirect file
+                //Redirect output to a file
                 break;
+	    // Uses the same logic as in the signal handler
+	    // but prints to the screen this time
             case History:
                  for (int i = 0; i < MIN(history_index, 10); i++) {
                      if ((history_index % 10) - 1 - i >= 0) {
@@ -183,18 +194,28 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
                      }
                  }
                  break;
+	    // The +1 is added to the counter to make
+	    // sure the path arguemnt is used
             case Cd:
 		 status_code = chdir(token_arr[i+1]);
                  break;
+	    // This use case strips the extra characters from the end
+	    // of each line to not get weird console errors
             case Other:
                 cmd[cmd_num++] = token_arr[i];
                 break;
+            // This case should never be triggered and is used 
+	    // for error handling
             default:
+		printf("An error happened in the run_cmd function");
                 exit(1);
                 break;
         }
     }
-    
+   
+   // This is the default case for running the commands.
+   // It also makes sure that a special character was not 
+   // included 
     if(token_type[num_tok-1] != Ampersand | token_type[num_tok-1] != Cd | token_type[num_tok-1] != History) {
         switch (pid = fork()) {
             case 0:
@@ -214,13 +235,15 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
 }
 
 int main() {
+
     char* tokens[CMD_LENGTH];
     Tokens token_type[CMD_LENGTH];
     int num_tok = 0;
-
     
     while (1) {
-	
+        
+        // This is where the USR1 signal is intercepted
+	// and raised to the handler	    
 	signal(SIGUSR1,signalHandler);
 	raise(SIGUSR1);
 
@@ -228,7 +251,11 @@ int main() {
 
         num_tok = tokenize_cmd(tokens, token_type);
         if (num_tok == 0) continue;
-
+        
+	// This is the main logic that enables the history
+	// variable to work. It is an array that checks for 
+	// the newest commands and the last ones get overwritten
+	// through the modulous operator.
         strcpy(history[history_index % 10], "");
         for (int i = 0; i < num_tok - 1; i++) {
             strcat(history[history_index % 10], tokens[i]);
@@ -236,7 +263,9 @@ int main() {
         }
         strcat(history[history_index % 10], tokens[num_tok - 1]);
         history_index++;
-
+        
+	// This is the conditional to catch the error statements
+	// and exits the program
         if (num_tok == -1 || num_tok == -2) {
             puts("PANIC");
             return 1;
