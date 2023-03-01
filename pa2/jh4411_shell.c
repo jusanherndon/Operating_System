@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <fcntl.h>
 
 #define TOKEN_LENGTH  64
 #define CMD_LENGTH    256
@@ -37,8 +38,8 @@ void signalHandler(int signal){
                 fprintf(file,"%3d: %s\n", i + 1, history[(history_index % 10) - i + 9]);
                 }
             }
+        fclose(file);
 	}
-    fclose(file);
     exit(0);
     return;
 }
@@ -164,7 +165,6 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
                      case 0:
                          cmd[cmd_num] = NULL;
                          execvp(cmd[0], cmd);
-                         exit(1);
                          break;
                      case -1:
                          fprintf(stderr, "ERROR");
@@ -178,7 +178,18 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
 	    // unimplemented
             case Less_Than:
                 //Redirect a file into stdin
-                break;
+		/*
+                 cmd[cmd_num] = NULL;
+                 int fileout=open(token_arr[i+1],O_WRONLY|O_TRUNC|O_CREAT,0644);
+    		 dup2(fileout,1);  // stdout goes to fileout 
+    		 close(fileout);   // don't need fileout, the dup is fine 
+
+                 execvp(cmd[0],cmd);   // first argument is executeable name, 2nd is vector including name and any args 
+		 // Error checking for the less than sign
+                 printf("It did not work if this prints!\n");
+                 exit(1);
+		 */
+                 break;
             case Greater_Than:
                 //Redirect output to a file
                 break;
@@ -197,6 +208,7 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
 	    // The +1 is added to the counter to make
 	    // sure the path arguemnt is used
             case Cd:
+                 cmd[cmd_num] = NULL;
 		 status_code = chdir(token_arr[i+1]);
                  break;
 	    // This use case strips the extra characters from the end
@@ -221,7 +233,6 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
             case 0:
                 cmd[cmd_num] = NULL;
                 execvp(cmd[0], cmd);
-                exit(1);
                 break;
             case -1:
                 fprintf(stderr, "ERROR");
@@ -244,8 +255,9 @@ int main() {
         
         // This is where the USR1 signal is intercepted
 	// and raised to the handler	    
-	signal(SIGUSR1,signalHandler);
-	raise(SIGUSR1);
+	if(signal(SIGUSR1,signalHandler)){
+	    raise(SIGUSR1);
+	}
 
         printf("[fake@shell]$ ");
 
