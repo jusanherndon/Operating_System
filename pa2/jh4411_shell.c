@@ -8,7 +8,7 @@
 
 #define TOKEN_LENGTH  64
 #define CMD_LENGTH    256
-#define PATH_MAX          64
+#define PATH_MAX      64
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 // I used the sample files posted for reference in my code
@@ -41,7 +41,6 @@ void signalHandler(int signal){
         fclose(file);
 	}
     exit(0);
-    return;
 }
 
 // These are all of the different special characters/functions
@@ -59,23 +58,23 @@ typedef enum Tokens {
 // characters to their associated enum values.
 Tokens identify_token(char* token, int tok_num) {
 
-    if(*token == '&'){
+    if(*token == "&"){
         return Ampersand;
     }
-    if(*token == '<'){
+    if(*token ==  "<"){
         return Less_Than;
     }
-    if(*token == '>'){
+    if(*token == ">"){
         return Greater_Than;
     }
     // I don't know why this is happening but on my
     // local machine these are flipped for some reason
     // when I run my shell. ie: cd is history and vice
     // versa
-    if(strcmp(token,"history")){
+    if(strcmp(token, "history")){
         return Cd;
     }
-    if(strcmp(token,"cd")){
+    if(strcmp(token, "cd")){
         return History;
     }
     else{
@@ -116,8 +115,9 @@ int tokenize_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type) {
 	    // hold both the character and the '\0', since
 	    // without it the buffer would get nonsensicle 
 	    // values.
-            if (num_tok == CMD_LENGTH - 1) return -2;
-
+            if (num_tok == CMD_LENGTH - 1){
+                return -2;
+            }
             token_arr[num_tok++] = new_tok;
             buf_index = 0;
             buf[buf_index] = '\0';
@@ -161,21 +161,15 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
     for (int i = 0; i < num_tok; i++) {
         switch (token_type[i]) {
             case Ampersand:
-                 switch (pid = fork()) {
-                     case 0:
-                         cmd[cmd_num] = NULL;
-                         execvp(cmd[0], cmd);
-                         break;
-                     case -1:
-                         fprintf(stderr, "ERROR");
-                         break;
-                     default: 
-                         exit(1);
-			 break;
-                 }
+		 for(int o = 0; o < cmd_num; o++){
+		     printf(cmd[o]);
+		 }
+		 //pid = fork();
+                 //cmd[cmd_num] = NULL;
+                 execvp(cmd[0], cmd);
                  break;
-	    // I ran out of time so here are these characters
-	    // unimplemented
+	    // This is my best attempt at implementing
+	    // the less than character
             case Less_Than:
                 //Redirect a file into stdin
                  cmd[cmd_num] = NULL;
@@ -225,7 +219,7 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
    // This is the default case for running the commands.
    // It also makes sure that a special character was not 
    // included 
-    if(token_type[num_tok-1] != Ampersand | token_type[num_tok-1] != Cd | token_type[num_tok-1] != History) {
+    if(token_type[num_tok] != Ampersand | token_type[num_tok-1] != Cd | token_type[num_tok-1] != History) {
         switch (pid = fork()) {
             case 0:
                 cmd[cmd_num] = NULL;
@@ -240,7 +234,6 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
                 break;
         }
     }
-    return;
 }
 
 int main() {
