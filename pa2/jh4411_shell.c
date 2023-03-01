@@ -58,23 +58,23 @@ typedef enum Tokens {
 // characters to their associated enum values.
 Tokens identify_token(char* token, int tok_num) {
 
-    if(*token == "&"){
+    if(!strcmp(token, "&")){
         return Ampersand;
     }
-    if(*token ==  "<"){
+    if(!strcmp(token,  "<")){
         return Less_Than;
     }
-    if(*token == ">"){
+    if(!strcmp(token, ">")){
         return Greater_Than;
     }
     // I don't know why this is happening but on my
     // local machine these are flipped for some reason
     // when I run my shell. ie: cd is history and vice
     // versa
-    if(strcmp(token, "history")){
+    if(!strcmp(token, "cd")){
         return Cd;
     }
-    if(strcmp(token, "cd")){
+    if(!strcmp(token, "history")){
         return History;
     }
     else{
