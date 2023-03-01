@@ -179,10 +179,25 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
             case Less_Than:
                 //Redirect a file into stdin
                  cmd[cmd_num] = NULL;
-                 int fileout=open(token_arr[i+1],O_WRONLY|O_TRUNC|O_CREAT,0644);
-    		 dup2(fileout,1);  // stdout goes to fileout 
-    		 close(fileout);   // don't need fileout, the dup is fine 
-                 execvp(cmd[0],cmd);   // first argument is executeable name, 2nd is vector including name and any args 
+		 if(token_arr[i+1] != NULL){
+                     int fileout=open(token_arr[i+1],O_WRONLY|O_TRUNC|O_CREAT,0644);
+		     dup2(fileout,1);  // stdout goes to fileout 
+    		     close(fileout);   // don't need fileout, the dup is fine 
+                     switch (pid = fork()) {
+                         case 0:
+                               cmd[cmd_num] = NULL;
+                               execvp(cmd[0], cmd);
+                               exit(1);
+                               break;
+                         case -1:
+                               fprintf(stderr, "ERROR");
+			       exit(1);
+                               break;
+                         default:
+			       wait(NULL);
+		               return;	
+                     }
+		 }
 		 // Error checking for the less than sign
                  printf("It did not work if this prints!\n");
                  exit(1);
@@ -223,8 +238,6 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
     }
    
    // This is the default case for running the commands.
-   // It also makes sure that a special character was not 
-   // included 
         switch (pid = fork()) {
             case 0:
                 cmd[cmd_num] = NULL;
