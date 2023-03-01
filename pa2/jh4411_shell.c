@@ -161,13 +161,19 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
     for (int i = 0; i < num_tok; i++) {
         switch (token_type[i]) {
             case Ampersand:
-		 for(int o = 0; o < cmd_num; o++){
-		     printf(cmd[o]);
-		 }
-		 //pid = fork();
-                 //cmd[cmd_num] = NULL;
-                 execvp(cmd[0], cmd);
-                 break;
+                switch (pid = fork()) {
+                    case 0:
+                        cmd[cmd_num] = NULL;
+                        execvp(cmd[0], cmd);
+                        exit(1);
+                        break;
+                    case -1:
+                        fprintf(stderr, "ERROR");
+                        break;
+                    default:
+		       return;	
+                }
+                break;
 	    // This is my best attempt at implementing
 	    // the less than character
             case Less_Than:
@@ -219,7 +225,6 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
    // This is the default case for running the commands.
    // It also makes sure that a special character was not 
    // included 
-    if(token_type[num_tok] != Ampersand | token_type[num_tok-1] != Cd | token_type[num_tok-1] != History) {
         switch (pid = fork()) {
             case 0:
                 cmd[cmd_num] = NULL;
@@ -233,7 +238,6 @@ void run_cmd(char* token_arr[CMD_LENGTH], Tokens* token_type, char history[10][C
                 wait(NULL);
                 break;
         }
-    }
 }
 
 int main() {
@@ -249,6 +253,7 @@ int main() {
 	signal(SIGUSR1,signalHandler);
 
         printf("[fake@shell]$ ");
+	fflush(stdout);
 
         num_tok = tokenize_cmd(tokens, token_type);
         if (num_tok == 0) continue;
