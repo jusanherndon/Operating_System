@@ -1,18 +1,23 @@
 #include <stdio.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 int filelinecount(char filename[]){
 FILE* file;
-int lines;
-char buf[200];
+int lines = 0;
+
+char *line = NULL;
+size_t len = 0;
+ssize_t read;
+
 
 file = fopen(filename, "r"); 
 
-while(fgets(buf,sizeof(buf),file) != NULL)
-{
-  lines++;
+while((read = getline(&line, &len, file)) != -1){
+     lines++;
 }
 
+fclose(file);
 return lines;
 }
 
@@ -20,7 +25,8 @@ int main(int argc, char* argv[]) {
 int linecount = 0;
 int lines;
 
-for(int i = 1; i <argc; i++){
+for(int i = 1; i <argc -1; i++){
+     printf(argv[i]);
      lines = filelinecount(argv[i]);
      printf("\n%d %s\n", lines, argv[i]);
      linecount += lines;
