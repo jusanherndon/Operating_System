@@ -9,7 +9,6 @@ int lines = 0;
 int linecount = 0;
 
 void* filelinecount(void * arg){
-pthread_mutex_lock(&lock);
 FILE* file;
 
 char *line = NULL;
@@ -19,12 +18,15 @@ ssize_t read;
 file = fopen(arg, "r"); 
 
 while((read = getline(&line, &len, file)) != -1){
+pthread_mutex_lock(&lock);
      lines++;
+pthread_mutex_unlock(&lock);
 }
 
 printf("%d %s\n", lines, arg);
 
 fclose(file);
+pthread_mutex_lock(&lock);
 linecount += lines;
 lines = 0;
 pthread_mutex_unlock(&lock);
