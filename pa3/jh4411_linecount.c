@@ -25,8 +25,8 @@ while((read = getline(&line, &len, file)) != -1){
 printf("%d %s\n", lines, arg);
 
 fclose(file);
-lines = 0;
 linecount += lines;
+lines = 0;
 pthread_mutex_unlock(&lock);
 }
 
