@@ -48,8 +48,8 @@ for(int i = 1; i <argc; i++){
      pthread_join(tid[i-1], NULL);
 }
 
+printf("%d total\n", linecount);
 pthread_exit(NULL);
 pthread_mutex_destroy(&lock);
-printf("%d total\n", linecount);
 return 0;
 }
