@@ -30,6 +30,7 @@ pthread_mutex_lock(&lock);
 linecount += lines;
 lines = 0;
 pthread_mutex_unlock(&lock);
+pthread_exit(NULL);
 }
 
 int main(int argc, char* argv[]) {
