@@ -2,6 +2,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
+#include <stdint.h>
+#include <time.h>
 
 typedef enum FileTypes {
      File,
@@ -47,6 +49,15 @@ if(argc < 51){
           if(argv[i] != NULL){
                stat(argv[i],&sfile);
                int type = sfile.st_mode;
+	       int uid = sfile.st_uid;
+	       int gid = sfile.st_gid;
+	       int hard_links = sfile.st_nlink;
+	       int last_access = sfile.st_atime;
+	       int last_modification = sfile.st_mtime;
+	       int last_status = sfile.st_ctime;
+	       int size = sfile.st_size;
+	       int inode = sfile.st_ino;
+
 	       file_type[i] = identify_file(type);
 	       switch(file_type[i]){
 	        
@@ -83,6 +94,14 @@ if(argc < 51){
 			 break;
 	       
 	       }
+	       printf("This is the user id for %s: %d\n",argv[i],uid);
+	       printf("This is the group id for %s: %d\n",argv[i],gid);
+               printf("This is the hard links for %s: %d\n",argv[i],hard_links);
+               printf("This is the last access time for %s: %d\n",argv[i],last_access);
+               printf("This is the last modification time for %s: %d\n",argv[i],last_modification);
+               printf("This is the last status for %s: %d\n",argv[i],last_status);
+               printf("This is the file size for %s: %d\n",argv[i],size);
+               printf("This is the inode number for %s: %d\n",argv[i],inode);
 
 	  }
      }
