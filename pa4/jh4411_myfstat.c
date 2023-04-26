@@ -115,8 +115,10 @@ getrusage(RUSAGE_SELF,&system_usage);
 struct timeval user_cpu_time = system_usage.ru_utime;
 struct timeval system_cpu_time = system_usage.ru_stime;
 
+// Based the formatting of this print statement from this
+// stack overflow question:
+// https://stackoverflow.com/questions/1469495/unix-programming-struct-timeval-how-to-print-it-c-programming
 printf("User cpu time used: %ld.%06ld\n", user_cpu_time.tv_sec, user_cpu_time.tv_usec);
 printf("System cpu time used: %ld.%06ld\n", system_cpu_time.tv_sec, system_cpu_time.tv_usec);
-
 
 }
