@@ -6,8 +6,7 @@
 #include <sys/sysmacros.h>
 #include <sys/resource.h>
 
-// I used this enum to clean up the file type
-// identification
+// I used this enum to make the consts' more readable
 typedef enum FileTypes {
      File,
      Directory,
