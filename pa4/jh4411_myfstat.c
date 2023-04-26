@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/sysmacros.h>
 #include <stdint.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <sys/sysmacros.h>
+#include <sys/resource.h>
 
 typedef enum FileTypes {
      File,
@@ -42,6 +43,7 @@ FileTypes identify_file(int st_mode){
 int main(int argc, char *argv[]){
 
 struct stat sfile;
+struct rusage system_usage;
 FileTypes file_type[50];
 
 if(argc < 51){
@@ -104,8 +106,17 @@ if(argc < 51){
                printf("This is the inode number for %s: %d\n",argv[i],inode);
 
 	  }
+	  printf("\n");
      }
 
 }
+
+getrusage(RUSAGE_SELF,&system_usage);
+struct timeval user_cpu_time = system_usage.ru_utime;
+struct timeval system_cpu_time = system_usage.ru_stime;
+
+printf("User cpu time used: %ld.%06ld\n", user_cpu_time.tv_sec, user_cpu_time.tv_usec);
+printf("System cpu time used: %ld.%06ld\n", system_cpu_time.tv_sec, system_cpu_time.tv_usec);
+
 
 }
