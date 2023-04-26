@@ -6,6 +6,8 @@
 #include <sys/sysmacros.h>
 #include <sys/resource.h>
 
+// I used this enum to clean up the file type
+// identification
 typedef enum FileTypes {
      File,
      Directory,
@@ -41,13 +43,17 @@ FileTypes identify_file(int st_mode){
 }
 
 int main(int argc, char *argv[]){
-
 struct stat sfile;
 struct rusage system_usage;
 FileTypes file_type[50];
 
+// This requirement exists to ensure the list can only accept
+// 50 file names
 if(argc < 51){
+     // The for loop starts at 1 to avoid taking in the executable as 
+     // a parameter
      for(int i=1; i<argc;i++){
+	  // This check makes sure that a valid file name is passed 
           if(argv[i] != NULL){
                stat(argv[i],&sfile);
                int type = sfile.st_mode;
@@ -62,7 +68,6 @@ if(argc < 51){
 
 	       file_type[i] = identify_file(type);
 	       switch(file_type[i]){
-	        
                     case File:
 		         printf("%s is a file\n",argv[i]);
 			 break;
@@ -94,7 +99,6 @@ if(argc < 51){
                     case Unknown:
 		         printf("%s is unknown\n",argv[i]);
 			 break;
-	       
 	       }
 	       printf("This is the user id for %s: %d\n",argv[i],uid);
 	       printf("This is the group id for %s: %d\n",argv[i],gid);
@@ -104,11 +108,9 @@ if(argc < 51){
                printf("This is the last status for %s: %d\n",argv[i],last_status);
                printf("This is the file size for %s: %d\n",argv[i],size);
                printf("This is the inode number for %s: %d\n",argv[i],inode);
-
 	  }
 	  printf("\n");
      }
-
 }
 
 getrusage(RUSAGE_SELF,&system_usage);
@@ -120,5 +122,4 @@ struct timeval system_cpu_time = system_usage.ru_stime;
 // https://stackoverflow.com/questions/1469495/unix-programming-struct-timeval-how-to-print-it-c-programming
 printf("User cpu time used: %ld.%06ld\n", user_cpu_time.tv_sec, user_cpu_time.tv_usec);
 printf("System cpu time used: %ld.%06ld\n", system_cpu_time.tv_sec, system_cpu_time.tv_usec);
-
 }
